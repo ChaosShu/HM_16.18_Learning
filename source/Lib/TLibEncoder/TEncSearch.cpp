@@ -2975,8 +2975,8 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
 
   pcRecoYuv->clear();
 
-  TComMv       cMvSrchRngLT;
-  TComMv       cMvSrchRngRB;
+  TComMv       cMvSrchRngLT;//left-top
+  TComMv       cMvSrchRngRB;//right-below
 
   TComMv       cMvZero;
   TComMv       TempMv; //kolya
@@ -3019,7 +3019,7 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
   UChar uhInterDirNeighbours[MRG_MAX_NUM_CANDS];
   Int numValidMergeCand = 0 ;
 
-  for ( Int iPartIdx = 0; iPartIdx < iNumPart; iPartIdx++ )
+  for ( Int iPartIdx = 0; iPartIdx < iNumPart; iPartIdx++ )//每个PU
   {
     Distortion   uiCost[2] = { std::numeric_limits<Distortion>::max(), std::numeric_limits<Distortion>::max() };
     Distortion   uiCostBi  =   std::numeric_limits<Distortion>::max();
@@ -3058,11 +3058,11 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
 #endif
 
     //  Uni-directional prediction
-    for ( Int iRefList = 0; iRefList < iNumPredDir; iRefList++ )
+    for ( Int iRefList = 0; iRefList < iNumPredDir; iRefList++ )//每个可用list都循环一边
     {
       RefPicList  eRefPicList = ( iRefList ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
 
-      for ( Int iRefIdxTemp = 0; iRefIdxTemp < pcCU->getSlice()->getNumRefIdx(eRefPicList); iRefIdxTemp++ )
+      for ( Int iRefIdxTemp = 0; iRefIdxTemp < pcCU->getSlice()->getNumRefIdx(eRefPicList); iRefIdxTemp++ )//处理当前帧一个list里的每张参考图像
       {
         uiBitsTemp = uiMbBits[iRefList];
         if ( pcCU->getSlice()->getNumRefIdx(eRefPicList) > 1 )

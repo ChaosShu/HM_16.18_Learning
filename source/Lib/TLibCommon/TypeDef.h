@@ -107,7 +107,7 @@
 
 #define AMP_ENC_SPEEDUP                                   1 ///< encoder only speed-up by AMP mode skipping
 #if AMP_ENC_SPEEDUP
-#define AMP_MRG                                           1 ///< encoder only force merge for AMP partition (no motion search for AMP)
+#define AMP_MRG                                           1 /*//< encoder only force merge for AMP partition (no motion search for AMP)，强制Merge模式，没有运动搜索*/
 #endif
 
 #define FAST_BIT_EST                                      1 ///< G763: Table-based bit estimation for CABAC

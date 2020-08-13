@@ -88,8 +88,8 @@ Void TComYuv::destroy()
     }
   }
 }
-
-Void TComYuv::clear()
+//清理目标内存
+Void TComYuv::clear()//清理目标内存
 {
   for(Int comp=0; comp<MAX_NUM_COMPONENT; comp++)
   {
