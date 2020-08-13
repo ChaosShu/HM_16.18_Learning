@@ -77,14 +77,14 @@ private:
   // -------------------------------------------------------------------------------------------------------------------
 
   UInt          m_ctuRsAddr;                            ///< CTU (also known as LCU) address in a slice (Raster-scan address, as opposed to tile-scan/encoding order).
-  UInt          m_absZIdxInCtu;                         ///< absolute address in a CTU. It's Z scan order
-  UInt          m_uiCUPelX;                             ///< CU position in a pixel (X)
-  UInt          m_uiCUPelY;                             ///< CU position in a pixel (Y)
-  UInt          m_uiNumPartition;                       ///< total number of minimum partitions in a CU
-  UChar*        m_puhWidth;                             ///< array of widths
-  UChar*        m_puhHeight;                            ///< array of heights
-  UChar*        m_puhDepth;                             ///< array of depths
-  Int           m_unitSize;                             ///< size of a "minimum partition"
+  UInt          m_absZIdxInCtu;                         /*//< absolute address in a CTU. It's Z scan order*/
+  UInt          m_uiCUPelX;                             /*//< CU position in a pixel (X)*/
+  UInt          m_uiCUPelY;                             /*//< CU position in a pixel (Y)*/
+  UInt          m_uiNumPartition;                       /*//< total number of minimum partitions（） in a CU，以类似scu形式的计数，*/
+  UChar*        m_puhWidth;                             /*//< array of widths*/
+  UChar*        m_puhHeight;                            /*//< array of heights*/
+  UChar*        m_puhDepth;                             /*//< array of depths*/
+  Int           m_unitSize;                             /*//< size of a "minimum partition"*/
 
   // -------------------------------------------------------------------------------------------------------------------
   // CU data

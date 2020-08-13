@@ -1854,6 +1854,7 @@ Void TComDataCU::getPartIndexAndSize( UInt uiPartIdx, UInt& ruiPartAddr, Int& ri
 {
   switch ( m_pePartSize[0] )
   {
+      /*这里的m_uiNumPartition是一个CU内的SCU数，具体的见pic文件夹下“m_uiNumPartition”*/
     case SIZE_2NxN:
       riWidth = getWidth(0);      riHeight = getHeight(0) >> 1; ruiPartAddr = ( uiPartIdx == 0 )? 0 : m_uiNumPartition >> 1;
       break;
@@ -2624,7 +2625,7 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
 
   //-- Get Spatial MV
   UInt partIdxLT, partIdxRT, partIdxLB;
-  deriveLeftRightTopIdx( partIdx, partIdxLT, partIdxRT );
+  deriveLeftRightTopIdx( partIdx, partIdxLT, partIdxRT );//什么意思
   deriveLeftBottomIdx( partIdx, partIdxLB );
 
   Bool isScaledFlagLX = false; /// variable name from specification; true when the PUs below left or left are available (availableA0 || availableA1).
@@ -2642,16 +2643,16 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
   // Left predictor search
   if (isScaledFlagLX)
   {
-    Bool bAdded = xAddMVPCandUnscaled( *pInfo, eRefPicList, refIdx, partIdxLB, MD_BELOW_LEFT);
+    Bool bAdded = xAddMVPCandUnscaled( *pInfo, eRefPicList, refIdx, partIdxLB, MD_BELOW_LEFT);//先左下↙A1
     if (!bAdded)
     {
-      bAdded = xAddMVPCandUnscaled( *pInfo, eRefPicList, refIdx, partIdxLB, MD_LEFT );
+      bAdded = xAddMVPCandUnscaled( *pInfo, eRefPicList, refIdx, partIdxLB, MD_LEFT );//再左←A1
       if(!bAdded)
       {
-        bAdded = xAddMVPCandWithScaling( *pInfo, eRefPicList, refIdx, partIdxLB, MD_BELOW_LEFT);
+        bAdded = xAddMVPCandWithScaling( *pInfo, eRefPicList, refIdx, partIdxLB, MD_BELOW_LEFT);//再scaled左下
         if (!bAdded)
         {
-          xAddMVPCandWithScaling( *pInfo, eRefPicList, refIdx, partIdxLB, MD_LEFT );
+          xAddMVPCandWithScaling( *pInfo, eRefPicList, refIdx, partIdxLB, MD_LEFT );//再scaled左
         }
       }
     }
@@ -2670,7 +2671,7 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
     }
   }
 
-  if(!isScaledFlagLX)
+  if(!isScaledFlagLX)//仅当左侧PU的MV不可用时 或 左侧PU都是帧内预测时 才进行scale上方MV的操作
   {
     Bool bAdded = xAddMVPCandWithScaling( *pInfo, eRefPicList, refIdx, partIdxRT, MD_ABOVE_RIGHT);
     if (!bAdded)

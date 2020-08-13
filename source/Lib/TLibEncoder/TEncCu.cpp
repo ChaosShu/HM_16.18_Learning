@@ -452,10 +452,10 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
   Bool    doNotBlockPu = true;
   Bool    earlyDetectionSkipMode = false;
 
-  const UInt uiLPelX   = rpcBestCU->getCUPelX();
-  const UInt uiRPelX   = uiLPelX + rpcBestCU->getWidth(0)  - 1;
-  const UInt uiTPelY   = rpcBestCU->getCUPelY();
-  const UInt uiBPelY   = uiTPelY + rpcBestCU->getHeight(0) - 1;
+  const UInt uiLPelX   = rpcBestCU->getCUPelX();//×ó±ßÏñËØX
+  const UInt uiRPelX   = uiLPelX + rpcBestCU->getWidth(0)  - 1;//ÓÒ±ßÏñËØX
+  const UInt uiTPelY   = rpcBestCU->getCUPelY();//ÉÏ·½ÏñËØY
+  const UInt uiBPelY   = uiTPelY + rpcBestCU->getHeight(0) - 1;//ÏÂ·½ÏñËØY
   const UInt uiWidth   = rpcBestCU->getWidth(0);
 
   Int iBaseQP = xComputeQP( rpcBestCU, uiDepth );
@@ -512,9 +512,9 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, const 
 
   const Bool bBoundary = !( uiRPelX < sps.getPicWidthInLumaSamples() && uiBPelY < sps.getPicHeightInLumaSamples() );
 
-  if ( !bBoundary )
+  if ( !bBoundary )//Î´¼°±ß½ç
   {
-    for (Int iQP=iMinQP; iQP<=iMaxQP; iQP++)
+    for (Int iQP=iMinQP; iQP<=iMaxQP; iQP++)//ÎªÊ²Ã´¶ÔQPÑ­»·£¿
     {
       const Bool bIsLosslessMode = isAddLowestQP && (iQP == iMinQP);
 
