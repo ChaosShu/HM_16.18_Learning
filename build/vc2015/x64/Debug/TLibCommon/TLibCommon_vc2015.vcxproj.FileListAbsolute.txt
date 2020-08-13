@@ -1,0 +1,2 @@
+D:\HM-16.18\build\vc2015\x64\Debug\TLibCommon\TLibCommon.lib
+D:\HM-16.18\build\vc2015\x64\Debug\TLibCommon\TLibCommon.pdb

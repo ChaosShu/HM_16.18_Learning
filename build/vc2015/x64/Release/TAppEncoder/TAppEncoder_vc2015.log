@@ -1,0 +1,10 @@
+﻿  encmain.cpp
+  TAppEncCfg.cpp
+  TAppEncTop.cpp
+  正在生成代码...
+  正在生成代码
+  2199 of 5117 functions (43.0%) were compiled, the rest were copied from previous compilation.
+    4 functions were new in current compilation
+    21 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  TAppEncoder_vc2015.vcxproj -> D:\HM-16.18\build\\..\bin\vc2015\x64\Release\TAppEncoder.exe

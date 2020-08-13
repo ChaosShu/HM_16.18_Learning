@@ -1,0 +1,8 @@
+﻿  decmain.cpp
+  TAppDecCfg.cpp
+  TAppDecTop.cpp
+  正在生成代码
+  Compiler version has changed, fall back to full compilation.
+  All 4105 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  已完成代码的生成
+  TAppDecoder_vc2015.vcxproj -> D:\HM-16.18\build\\..\bin\vc2015\x64\Release\TAppDecoder.exe
