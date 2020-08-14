@@ -1,7 +1,9 @@
-***uh:unsigned char?
-***e :enum，枚举
-***r :return， 见于形参中，type& r_var,表示形参的值会改变
-
+***uh            :unsigned char?
+***e             :enum，枚举
+***r             :return， 见于形参中，type& r_var,表示形参的值会改变
+***part          : 等同于AVS3中的SCU
+***absIdx        :Raster索引
+***AbsZorderIdx   ：Zorder索引
 
 
 

@@ -76,7 +76,7 @@ private:
   // CU description
   // -------------------------------------------------------------------------------------------------------------------
 
-  UInt          m_ctuRsAddr;                            ///< CTU (also known as LCU) address in a slice (Raster-scan address, as opposed to tile-scan/encoding order).
+  UInt          m_ctuRsAddr;                            /*/< CTU (also known as LCU) address in a slice (Raster-scan address, as opposed to tile-scan/encoding order).*/
   UInt          m_absZIdxInCtu;                         /*//< absolute address in a CTU. It's Z scan order*/
   UInt          m_uiCUPelX;                             /*//< CU position in a pixel (X)*/
   UInt          m_uiCUPelY;                             /*//< CU position in a pixel (Y)*/
@@ -87,12 +87,12 @@ private:
   Int           m_unitSize;                             /*//< size of a "minimum partition"*/
 
   // -------------------------------------------------------------------------------------------------------------------
-  // CU data
+  // CU data，（都是以part/scu为单位的）
   // -------------------------------------------------------------------------------------------------------------------
 
   Bool*         m_skipFlag;                             ///< array of skip flags
-  SChar*        m_pePartSize;                           ///< array of partition sizes
-  SChar*        m_pePredMode;                           ///< array of prediction modes
+  SChar*        m_pePartSize;                           /*//< array of partition sizes*/
+  SChar*        m_pePredMode;                           /*//< array of prediction modes*/
   SChar*        m_crossComponentPredictionAlpha[MAX_NUM_COMPONENT]; ///< array of cross-component prediction alpha values
   Bool*         m_CUTransquantBypass;                   ///< array of cu_transquant_bypass flags
   SChar*        m_phQP;                                 ///< array of QP values
