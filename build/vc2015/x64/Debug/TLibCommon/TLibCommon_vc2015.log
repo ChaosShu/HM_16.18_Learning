@@ -1,5 +1,31 @@
 ﻿cl : 命令行 warning D9035: “Gm”选项已否决，并将在将来的版本中移除
   TComYuv.cpp
+  TComWeightPrediction.cpp
+  TComTrQuant.cpp
+  TComTU.cpp
+  TComSlice.cpp
+  TComSampleAdaptiveOffset.cpp
+  TComRom.cpp
+  TComRdCostWeightPrediction.cpp
+  TComRdCost.cpp
   TComPrediction.cpp
+  TComPicYuvMD5.cpp
+  TComPicYuv.cpp
+  TComPicSym.cpp
+  TComPic.cpp
+  TComPattern.cpp
+  TComMotionInfo.cpp
+  TComLoopFilter.cpp
+  TComInterpolationFilter.cpp
+  TComDataCU.cpp
+  TComChromaFormat.cpp
+  正在生成代码...
+  正在编译...
+  TComCABACTables.cpp
+  TComBitStream.cpp
+  SEI.cpp
+  Debug.cpp
+  ContextModel3DBuffer.cpp
+  ContextModel.cpp
   正在生成代码...
   TLibCommon_vc2015.vcxproj -> D:\HM-16.18\build\\vc2015\x64\Debug\TLibCommon\TLibCommon.lib

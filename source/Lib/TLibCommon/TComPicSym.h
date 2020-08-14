@@ -89,14 +89,14 @@ private:
   UInt          m_uiMinCUWidth;
   UInt          m_uiMinCUHeight;
 
-  UChar         m_uhTotalDepth;       ///< max. depth
-  UInt          m_numPartitionsInCtu;
-  UInt          m_numPartInCtuWidth;
-  UInt          m_numPartInCtuHeight;
+  UChar         m_uhTotalDepth;       // /< max. depth
+  UInt          m_numPartitionsInCtu;//CTU内所有Part数
+  UInt          m_numPartInCtuWidth;//CTU高度上的Part数
+  UInt          m_numPartInCtuHeight;//CTU宽度上的Part数
   UInt          m_numCtusInFrame;
 
   std::deque<TComSlice*> m_apSlices;
-  TComDataCU**  m_pictureCtuArray;        ///< array of CU data.
+  TComDataCU**  m_pictureCtuArray;        /*//< array of CU data.*/
 
   Int           m_numTileColumnsMinus1;
   Int           m_numTileRowsMinus1;
