@@ -1869,7 +1869,7 @@ Void TComDataCU::getPartIndexAndSize( UInt uiPartIdx, UInt& ruiPartAddr, Int& ri
 {
   switch ( m_pePartSize[0] )
   {
-      /*这里的m_uiNumPartition是一个CU内的SCU数，具体的见pic文件夹下“m_uiNumPartition”*/
+      /*这里的m_uiNumPartition是一个CU内的SCU数，具体的见pic文件夹下“定位PU内不同位置”*/
     case SIZE_2NxN:
       riWidth = getWidth(0);      riHeight = getHeight(0) >> 1; ruiPartAddr = ( uiPartIdx == 0 )? 0 : m_uiNumPartition >> 1;
       break;
@@ -2061,7 +2061,7 @@ Void TComDataCU::deriveLeftRightTopIdx ( UInt uiPartIdx, UInt& ruiPartIdxLT, UIn
 Void TComDataCU::deriveLeftBottomIdx( UInt  uiPartIdx,      UInt&      ruiPartIdxLB ) const
 {//g_auiZscanToRaster[ m_absZIdxInCtu ]  CU左上角part的R索引
   ruiPartIdxLB      = g_auiRasterToZscan [g_auiZscanToRaster[ m_absZIdxInCtu ] + ( ((m_puhHeight[0] / m_pcPic->getMinCUHeight())>>1) - 1)*m_pcPic->getNumPartInCtuWidth()];
-  //(m_puhHeight[0] / m_pcPic->getMinCUHeight())>>1，你丫有毒吧，>>1导致：LB指向了2N*N时第一个PU的左下角part的Z索引，除此以外函数功能相同
+  //(m_puhHeight[0] / m_pcPic->getMinCUHeight())>>1，有毒，>>1导致：LB指向了2N*N时第一个PU的左下角part的Z索引，除此以外函数功能相同
   //只有Bottom形式的时候才会>>1，方便之后的操作？（一点都不方便阅读！）
   switch ( m_pePartSize[0] )
   {
