@@ -979,7 +979,7 @@ Void TComDataCU::copyToPic( UChar uhDepth )
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-// Other public functions
+// Other public functions   getPU_Direction 的各种情况见：pic/获取相邻PU
 // --------------------------------------------------------------------------------------------------------------------
 
 const TComDataCU* TComDataCU::getPULeft( UInt& uiLPartUnitIdx,
@@ -1130,14 +1130,12 @@ const TComDataCU* TComDataCU::getPUBelowLeft(UInt& uiBLPartUnitIdx,  UInt uiCurr
     {//非0列
       if ( uiCurrPartUnitIdx > g_auiRasterToZscan[ uiAbsPartIdxLB + uiPartUnitOffset * numPartInCtuWidth - 1 ] )//当前PU左下角Part的Z索引比A1（左下临域）的Z索引大
       {//即编码当前PU时，A1的PU已编码
-        uiBLPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxLB + uiPartUnitOffset * numPartInCtuWidth - 1 ];//para1变为A_PU右上角Part的R索引
-        if ( RasterAddress::isEqualRowOrCol( uiAbsPartIdxLB, uiAbsZorderCUIdxLB, numPartInCtuWidth ) )//当前PU与当前CU左边缘是否相等，或者下边缘是否相等
+        uiBLPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxLB + uiPartUnitOffset * numPartInCtuWidth - 1 ];//para1变为A1_PU的右上角Part的R索引（意味着uiBLPartUnitIdx已指向A1——LeftBlow）
+        if ( RasterAddress::isEqualRowOrCol( uiAbsPartIdxLB, uiAbsZorderCUIdxLB, numPartInCtuWidth ) )//当前PU与当前CU左边缘是否相等，或者下边缘是否相等（*什么时候不相等呢）
         {//是：返回当前CTU的R索引，且已更新uiBLPartUnitIdx（左下相邻PartA1）的Z索引
-            //**  完全搞懂后才该思考的问题：如果左下相邻PartA1不在当前CTU内怎么办
-            //**  答：“非0列”下方的代码已确保  左下相邻PartA1 是可用的，不会不在当前CTU内，否则无法进入此行代码
           return m_pcPic->getCtu( getCtuRsAddr() );
         }
-        else
+        else//否则uiBLPartUnitIdx指向CU起始part(下面这两行什么意思)
         {
           uiBLPartUnitIdx -= m_absZIdxInCtu;
           return this;
@@ -1146,37 +1144,39 @@ const TComDataCU* TComDataCU::getPUBelowLeft(UInt& uiBLPartUnitIdx,  UInt uiCurr
       uiBLPartUnitIdx = MAX_UINT;
       return NULL;
     }
-    uiBLPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxLB + (1+uiPartUnitOffset) * numPartInCtuWidth - 1 ];
+    //否则，当前PU左下角Part在第一列（左边已不是当前CTU）
+    uiBLPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxLB + (1+uiPartUnitOffset) * numPartInCtuWidth - 1 ];//指向下一行的最右边（同时需指出是左边的CTU）
     if ( bEnforceSliceRestriction && !CUIsFromSameSliceAndTile(m_pCtuLeft) )
     {
       return NULL;
     }
     return m_pCtuLeft;
   }
-
+  //如果左下领域part属于左下的CTU，则
   uiBLPartUnitIdx = MAX_UINT;
   return NULL;
 }
 
 const TComDataCU* TComDataCU::getPUAboveRight(UInt&  uiARPartUnitIdx, UInt uiCurrPartUnitIdx, UInt uiPartUnitOffset, Bool bEnforceSliceRestriction) const
 {
-  UInt uiAbsPartIdxRT     = g_auiZscanToRaster[uiCurrPartUnitIdx];
-  UInt uiAbsZorderCUIdx   = g_auiZscanToRaster[ m_absZIdxInCtu ] + (m_puhWidth[0] / m_pcPic->getMinCUWidth()) - 1;
+  UInt uiAbsPartIdxRT     = g_auiZscanToRaster[uiCurrPartUnitIdx];//当前PU右上角part的R索引（InCTU）
+  UInt uiAbsZorderCUIdx   = g_auiZscanToRaster[ m_absZIdxInCtu ] + (m_puhWidth[0] / m_pcPic->getMinCUWidth()) - 1;//当前CU右上角part的R索引（InCTU）
   const UInt numPartInCtuWidth = m_pcPic->getNumPartInCtuWidth();
 
   if( ( m_pcPic->getCtu(m_ctuRsAddr)->getCUPelX() + g_auiRasterToPelX[uiAbsPartIdxRT] + (m_pcPic->getPicSym()->getMinCUHeight() * uiPartUnitOffset)) >= m_pcSlice->getSPS()->getPicWidthInLumaSamples() )
-  {
+  {//CU起始点X + 右上角part相对于起始点part的偏移X地址 + 一个part的ΔX > PIC的宽度______即X超界
+      //当前PU是图像的右边缘会出现这种情况
     uiARPartUnitIdx = MAX_UINT;
     return NULL;
   }
 
   if ( RasterAddress::lessThanCol( uiAbsPartIdxRT, numPartInCtuWidth - uiPartUnitOffset, numPartInCtuWidth ) )
-  {
+  {//非end列
     if ( !RasterAddress::isZeroRow( uiAbsPartIdxRT, numPartInCtuWidth ) )
-    {
+    {//非0行
       if ( uiCurrPartUnitIdx > g_auiRasterToZscan[ uiAbsPartIdxRT - numPartInCtuWidth + uiPartUnitOffset ] )
       {
-        uiARPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxRT - numPartInCtuWidth + uiPartUnitOffset ];
+        uiARPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxRT - numPartInCtuWidth + uiPartUnitOffset ];//指向右上相邻part
         if ( RasterAddress::isEqualRowOrCol( uiAbsPartIdxRT, uiAbsZorderCUIdx, numPartInCtuWidth ) )
         {
           return m_pcPic->getCtu( getCtuRsAddr() );
@@ -1205,7 +1205,7 @@ const TComDataCU* TComDataCU::getPUAboveRight(UInt&  uiARPartUnitIdx, UInt uiCur
     return NULL;
   }
 
-  uiARPartUnitIdx = g_auiRasterToZscan[ m_pcPic->getNumPartitionsInCtu() - numPartInCtuWidth + uiPartUnitOffset-1 ];
+  uiARPartUnitIdx = g_auiRasterToZscan[ m_pcPic->getNumPartitionsInCtu() - numPartInCtuWidth + uiPartUnitOffset-1 ];//指向左下角（属于右上方的CTU）
   if ( bEnforceSliceRestriction && !CUIsFromSameSliceAndTile(m_pCtuAboveRight) )
   {
     return NULL;

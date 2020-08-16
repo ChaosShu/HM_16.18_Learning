@@ -114,14 +114,14 @@ private:
   // neighbour access variables
   // -------------------------------------------------------------------------------------------------------------------
 
-  TComDataCU*   m_pCtuAboveLeft;                        ///< pointer of above-left CTU.
-  TComDataCU*   m_pCtuAboveRight;                       ///< pointer of above-right CTU.
-  TComDataCU*   m_pCtuAbove;                            ///< pointer of above CTU.
-  TComDataCU*   m_pCtuLeft;                             ///< pointer of left CTU
-  TComMvField   m_cMvFieldA;                            ///< motion vector of position A
-  TComMvField   m_cMvFieldB;                            ///< motion vector of position B
-  TComMvField   m_cMvFieldC;                            ///< motion vector of position C
-  TComMv        m_cMvPred;                              ///< motion vector predictor
+  TComDataCU*   m_pCtuAboveLeft;                        /*//< pointer of above-left CTU.*/
+  TComDataCU*   m_pCtuAboveRight;                       /*//< pointer of above-right CTU.*/
+  TComDataCU*   m_pCtuAbove;                            /*//< pointer of above CTU.*/
+  TComDataCU*   m_pCtuLeft;                             /*//< pointer of left CTU*/
+  TComMvField   m_cMvFieldA;                            /*//< motion vector of position A*/
+  TComMvField   m_cMvFieldB;                            /*//< motion vector of position B*/
+  TComMvField   m_cMvFieldC;                            /*//< motion vector of position C*/
+  TComMv        m_cMvPred;                              /*//< motion vector predictor*/
 
   // -------------------------------------------------------------------------------------------------------------------
   // coding tool information
