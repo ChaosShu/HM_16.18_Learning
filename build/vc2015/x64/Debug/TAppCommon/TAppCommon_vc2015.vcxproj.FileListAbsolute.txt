@@ -1,2 +1,4 @@
 D:\HM-16.18\build\vc2015\x64\Debug\TAppCommon\TAppCommon.lib
 D:\HM-16.18\build\vc2015\x64\Debug\TAppCommon\TAppCommon.pdb
+D:\Chaos_Folder\HM_16.18_Learning\build\vc2015\x64\Debug\TAppCommon\TAppCommon.lib
+D:\Chaos_Folder\HM_16.18_Learning\build\vc2015\x64\Debug\TAppCommon\TAppCommon.pdb

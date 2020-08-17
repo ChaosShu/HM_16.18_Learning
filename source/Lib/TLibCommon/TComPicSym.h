@@ -165,7 +165,7 @@ public:
 #if REDUCED_ENCODER_MEMORY
   Bool                 hasDPBPerCtuData() const                            { return (m_dpbPerCtuData!=0); };
   DPBPerCtuData&       getDPBPerCtuData(UInt ctuRsAddr)                    { return m_dpbPerCtuData[ctuRsAddr]; }
-  const DPBPerCtuData& getDPBPerCtuData(UInt ctuRsAddr) const              { return m_dpbPerCtuData[ctuRsAddr]; }
+  const DPBPerCtuData& getDPBPerCtuData(UInt ctuRsAddr) const              { return m_dpbPerCtuData[ctuRsAddr]; }//获取当前CTU的DPB的相关信息/
 #endif
 
   TComSlice *        swapSliceObject(TComSlice* p, UInt i)                 { p->setSPS(&m_sps); p->setPPS(&m_pps); TComSlice *pTmp=m_apSlices[i];m_apSlices[i] = p; pTmp->setSPS(0); pTmp->setPPS(0); return pTmp; }

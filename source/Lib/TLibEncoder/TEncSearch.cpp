@@ -3019,7 +3019,7 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
   UChar uhInterDirNeighbours[MRG_MAX_NUM_CANDS];
   Int numValidMergeCand = 0 ;
 
-  for ( Int iPartIdx = 0; iPartIdx < iNumPart; iPartIdx++ )//每个PU
+  for ( Int iPartIdx = 0; iPartIdx < iNumPart; iPartIdx++ )//每个PU都执行一次
   {
     Distortion   uiCost[2] = { std::numeric_limits<Distortion>::max(), std::numeric_limits<Distortion>::max() };
     Distortion   uiCostBi  =   std::numeric_limits<Distortion>::max();
