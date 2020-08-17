@@ -249,7 +249,7 @@ static const UInt LUMA_LEVEL_TO_DQP_LUT_MAXSIZE =                1024; ///< max 
 // Macro functions
 // ====================================================================================================================
 
-template <typename T> inline T Clip3 (const T minVal, const T maxVal, const T a) { return std::min<T> (std::max<T> (minVal, a) , maxVal); }  ///< general min/max clip
+template <typename T> inline T Clip3 (const T minVal, const T maxVal, const T a) { return std::min<T> (std::max<T> (minVal, a) , maxVal); }  /*//< general min/max,clip将para3映射回[para1,para2]中，小于para1则强制变为para1，大于para2则强制标为para2*/
 template <typename T> inline T ClipBD(const T x, const Int bitDepth)             { return Clip3(T(0), T((1 << bitDepth)-1), x);           }
 
 template <typename T> inline Void Check3( T minVal, T maxVal, T a)

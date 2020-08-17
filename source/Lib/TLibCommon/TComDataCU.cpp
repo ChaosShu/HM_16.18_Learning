@@ -979,7 +979,7 @@ Void TComDataCU::copyToPic( UChar uhDepth )
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-// Other public functions   getPU_Direction 的各种情况见：pic/获取相邻PU
+// Other public functions   getPU_Direction 的各种情况见：pic/获取相邻PU 
 // --------------------------------------------------------------------------------------------------------------------
 
 const TComDataCU* TComDataCU::getPULeft( UInt& uiLPartUnitIdx,
@@ -1147,7 +1147,7 @@ const TComDataCU* TComDataCU::getPUBelowLeft(UInt& uiBLPartUnitIdx,  UInt uiCurr
     //否则，当前PU左下角Part在第一列（左边已不是当前CTU）
     uiBLPartUnitIdx = g_auiRasterToZscan[ uiAbsPartIdxLB + (1+uiPartUnitOffset) * numPartInCtuWidth - 1 ];//指向下一行的最右边（同时需指出是左边的CTU）
     if ( bEnforceSliceRestriction && !CUIsFromSameSliceAndTile(m_pCtuLeft) )
-    {
+    {//若左边Ctu与当前Ctu不在同一Slice或同一Tile()独立编码，则返回空指针(无PULeft）
       return NULL;
     }
     return m_pCtuLeft;
@@ -1864,7 +1864,9 @@ UChar TComDataCU::getNumPartitions(const UInt uiAbsPartIdx) const
   return  iNumPart;
 }
 
-// This is for use by a leaf/sub CU object only, with no additional AbsPartIdx
+/* This is for use by a leaf/sub CU object only, with no additional AbsPartIdx，
+*根据para1和划分方式更新para2：PU地址，para3：PU宽，para4：PU高
+*/
 Void TComDataCU::getPartIndexAndSize( UInt uiPartIdx, UInt& ruiPartAddr, Int& riWidth, Int& riHeight ) const
 {
   switch ( m_pePartSize[0] )
@@ -2095,7 +2097,7 @@ Void TComDataCU::deriveLeftBottomIdx( UInt  uiPartIdx,      UInt&      ruiPartId
   }
 }
 
-/** Derive the partition index of neighbouring bottom right block
+/** Derive the partition index of neighbouring bottom right block，更新para2的值，使其指向当前PU内的XX角part
  * \param [in]  uiPartIdx     current partition index
  * \param [out] ruiPartIdxRB  partition index of neighbouring bottom right block
  */
@@ -2632,7 +2634,7 @@ Void TComDataCU::getPartPosition( UInt partIdx, Int& xP, Int& yP, Int& nPSW, Int
  */
 Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const RefPicList eRefPicList, const Int refIdx, AMVPInfo* pInfo ) const
 {
-  pInfo->iN = 0;
+  pInfo->iN = 0;//初始化AMVP内存储的MVP数量为0
   if (refIdx < 0)
   {
 #if MCTS_ENC_CHECK
@@ -2702,7 +2704,7 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
     }
   }
 
-  if ( pInfo->iN == 2 )
+  if ( pInfo->iN == 2 )//check候选MVP的数量
   {
     if ( pInfo->m_acMvCand[ 0 ] == pInfo->m_acMvCand[ 1 ] )
     {
@@ -2723,32 +2725,32 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
     UInt absPartIdx;
 
     deriveRightBottomIdx( partIdx, partIdxRB );
-    UInt absPartAddr = m_absZIdxInCtu + partAddr;
+    UInt absPartAddr = m_absZIdxInCtu + partAddr;//当前PU的起始地址，part的Z索引
 
     //----  co-located RightBottom Temporal Predictor (H) ---//
-    absPartIdx = g_auiZscanToRaster[partIdxRB];
+    absPartIdx = g_auiZscanToRaster[partIdxRB];/*PU右下角part的R索引*/
     Int ctuRsAddr = -1;
     if (  ( ( m_pcPic->getCtu(m_ctuRsAddr)->getCUPelX() + g_auiRasterToPelX[absPartIdx] + m_pcPic->getMinCUWidth () ) < m_pcSlice->getSPS()->getPicWidthInLumaSamples () )  // image boundary check
        && ( ( m_pcPic->getCtu(m_ctuRsAddr)->getCUPelY() + g_auiRasterToPelY[absPartIdx] + m_pcPic->getMinCUHeight() ) < m_pcSlice->getSPS()->getPicHeightInLumaSamples() ) )
-    {
+    {//右下领域PU未超界
       if ( ( absPartIdx % numPartInCtuWidth < numPartInCtuWidth - 1 ) &&  // is not at the last column of CTU
            ( absPartIdx / numPartInCtuWidth < numPartInCtuHeight - 1 ) )  // is not at the last row    of CTU
-      {
+      {//即右下领域PU仍在当前CTU内(同位区)
         absPartAddr = g_auiRasterToZscan[ absPartIdx + numPartInCtuWidth + 1 ];
         ctuRsAddr = getCtuRsAddr();
       }
       else if ( absPartIdx % numPartInCtuWidth < numPartInCtuWidth - 1 )  // is not at the last column of CTU But is last row of CTU
-      {
-        absPartAddr = g_auiRasterToZscan[ (absPartIdx + numPartInCtuWidth + 1) % m_pcPic->getNumPartitionsInCtu() ];
+      {//即右下领域PU在当前CTU的下方(同位区)
+        absPartAddr = g_auiRasterToZscan[ (absPartIdx + numPartInCtuWidth + 1) % m_pcPic->getNumPartitionsInCtu() ];//第一行的相同列 + 1（属于下方CTU） 
       }
       else if ( absPartIdx / numPartInCtuWidth < numPartInCtuHeight - 1 ) // is not at the last row of CTU But is last column of CTU
-      {
-        absPartAddr = g_auiRasterToZscan[ absPartIdx + 1 ];
+      {//即右下领域PU在当前CTU的右侧(同位区)
+        absPartAddr = g_auiRasterToZscan[ absPartIdx + 1 ];//下一行的第一个（属于右侧CTU）
         ctuRsAddr = getCtuRsAddr() + 1;
       }
       else //is the right bottom corner of CTU
       {
-        absPartAddr = 0;
+        absPartAddr = 0;//属于右下邻的CTU
       }
     }
     if ( ctuRsAddr >= 0 && xGetColMVP( eRefPicList, ctuRsAddr, absPartAddr, cColMv, refIdx_Col ) )
@@ -2767,7 +2769,7 @@ Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const Re
     //----  co-located RightBottom Temporal Predictor  ---//
   }
 
-  while (pInfo->iN < AMVP_MAX_NUM_CANDS)
+  while (pInfo->iN < AMVP_MAX_NUM_CANDS)//候选表大小为2，不够则补（0，0）作为MVP
   {
     pInfo->m_acMvCand[pInfo->iN].set(0,0);
     pInfo->iN++;
@@ -2855,7 +2857,7 @@ Bool TComDataCU::isSkipped( UInt uiPartIdx ) const
 
 Bool TComDataCU::xAddMVPCandUnscaled( AMVPInfo &info, const RefPicList eRefPicList, const Int iRefIdx, const UInt uiPartUnitIdx, const MVP_DIR eDir ) const
 {
-  const TComDataCU* neibCU = NULL;
+  const TComDataCU* neibCU = NULL;//写是写出neibCU，实际上似乎是指向当前CTU的
   UInt neibPUPartIdx;
   switch( eDir )
   {
@@ -2896,16 +2898,16 @@ Bool TComDataCU::xAddMVPCandUnscaled( AMVPInfo &info, const RefPicList eRefPicLi
   }
 
   const Int        currRefPOC     = m_pcSlice->getRefPic( eRefPicList, iRefIdx)->getPOC();
-  const RefPicList eRefPicList2nd = (eRefPicList == REF_PIC_LIST_0) ? REF_PIC_LIST_1 : REF_PIC_LIST_0;
+  const RefPicList eRefPicList2nd = (eRefPicList == REF_PIC_LIST_0) ? REF_PIC_LIST_1 : REF_PIC_LIST_0;//赋值第二个参考列表
 
   for(Int predictorSource=0; predictorSource<2; predictorSource++) // examine the indicated reference picture list, then if not available, examine the other list.
-  {
+  {//逐个测试每个参考列表
     const RefPicList eRefPicListIndex = (predictorSource==0) ? eRefPicList : eRefPicList2nd;
-    const Int        neibRefIdx       = neibCU->getCUMvField(eRefPicListIndex)->getRefIdx(neibPUPartIdx);
-
-    if ( neibRefIdx >= 0 && currRefPOC == neibCU->getSlice()->getRefPOC( eRefPicListIndex, neibRefIdx ))
+    const Int        neibRefIdx       = neibCU->getCUMvField(eRefPicListIndex)->getRefIdx(neibPUPartIdx);//获取相邻PU的参考图像索引（根据CTU+neibPUPartIdx锁定左下领域PU的参考信息，因为neibPUPartIdx是part再CTU内的Z索引）
+    
+    if ( neibRefIdx >= 0 && currRefPOC == neibCU->getSlice()->getRefPOC( eRefPicListIndex, neibRefIdx ))//检验一致性
     {
-      info.m_acMvCand[info.iN++] = neibCU->getCUMvField(eRefPicListIndex)->getMv(neibPUPartIdx);
+      info.m_acMvCand[info.iN++] = neibCU->getCUMvField(eRefPicListIndex)->getMv(neibPUPartIdx);//更新MVP候选列表，（i++ 先用再加）
       return true;
     }
   }
@@ -2971,32 +2973,32 @@ Bool TComDataCU::xAddMVPCandWithScaling( AMVPInfo &info, const RefPicList eRefPi
   const Int  neibPOC            = currPOC;
 
   for(Int predictorSource=0; predictorSource<2; predictorSource++) // examine the indicated reference picture list, then if not available, examine the other list.
-  {
+  {//每个方向check执行一次
     const RefPicList eRefPicListIndex = (predictorSource==0) ? eRefPicList : eRefPicList2nd;
     const Int        neibRefIdx       = neibCU->getCUMvField(eRefPicListIndex)->getRefIdx(neibPUPartIdx);
     if( neibRefIdx >= 0)
     {
       const Bool bIsNeibRefLongTerm = neibCU->getSlice()->getRefPic( eRefPicListIndex, neibRefIdx )->getIsLongTerm();
 
-      if ( bIsCurrRefLongTerm == bIsNeibRefLongTerm )
+      if ( bIsCurrRefLongTerm == bIsNeibRefLongTerm )//当前PU与左下邻PU都 是或不是 LongTerm参考
       {
-        const TComMv &cMvPred = neibCU->getCUMvField(eRefPicListIndex)->getMv(neibPUPartIdx);
+        const TComMv &cMvPred = neibCU->getCUMvField(eRefPicListIndex)->getMv(neibPUPartIdx);//获取左下邻PU的MV
         TComMv rcMv;
         if ( bIsCurrRefLongTerm /* || bIsNeibRefLongTerm*/ )
         {
-          rcMv = cMvPred;
+          rcMv = cMvPred;//？
         }
         else
         {
           const Int neibRefPOC = neibCU->getSlice()->getRefPOC( eRefPicListIndex, neibRefIdx );
-          const Int scale      = xGetDistScaleFactor( currPOC, currRefPOC, neibPOC, neibRefPOC );
+          const Int scale      = xGetDistScaleFactor( currPOC, currRefPOC, neibPOC, neibRefPOC );//？？？？？？？？？
           if ( scale == 4096 )
           {
             rcMv = cMvPred;
           }
           else
           {
-            rcMv = cMvPred.scaleMv( scale );
+            rcMv = cMvPred.scaleMv( scale );//？？？？？？
           }
         }
 
@@ -3013,14 +3015,14 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
   const UInt absPartAddr = partUnitIdx;
 
   // use coldir.
-  const TComPic    * const pColPic = getSlice()->getRefPic( RefPicList(getSlice()->isInterB() ? 1-getSlice()->getColFromL0Flag() : 0), getSlice()->getColRefIdx());
+  const TComPic    * const pColPic = getSlice()->getRefPic( RefPicList(getSlice()->isInterB() ? 1-getSlice()->getColFromL0Flag() : 0), getSlice()->getColRefIdx());//根据ColFromL0Flag和ColRefIdx获取同位图像
 #if REDUCED_ENCODER_MEMORY
   if (!pColPic->getPicSym()->hasDPBPerCtuData())
   {
     return false;
   }
-  const TComPicSym::DPBPerCtuData * const pColDpbCtu = &(pColPic->getPicSym()->getDPBPerCtuData(ctuRsAddr));
-  const TComSlice * const pColSlice = pColDpbCtu->getSlice();
+  const TComPicSym::DPBPerCtuData * const pColDpbCtu = &(pColPic->getPicSym()->getDPBPerCtuData(ctuRsAddr));//输入CTU（）的DPB信息
+  const TComSlice * const pColSlice = pColDpbCtu->getSlice();//输入CTU所属Slice
   if(pColDpbCtu->getPartitionSize(partUnitIdx)==NUMBER_OF_PART_SIZES)
 #else
   const TComDataCU * const pColCtu = pColPic->getCtu( ctuRsAddr );
@@ -3031,7 +3033,7 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
   }
 
 #if REDUCED_ENCODER_MEMORY
-  if (!pColDpbCtu->isInter(absPartAddr))
+  if (!pColDpbCtu->isInter(absPartAddr))//帧内参考
 #else
   if (!pColCtu->isInter(absPartAddr))
 #endif
@@ -3047,8 +3049,8 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
 #endif
 
   if (iColRefIdx < 0 )
-  {
-    eColRefPicList = RefPicList(1 - eColRefPicList);
+  {//一个Ref_List的同位区的Ref_pic不可用
+    eColRefPicList = RefPicList(1 - eColRefPicList);//尝试另一个可用的Ref_list
 #if REDUCED_ENCODER_MEMORY
     iColRefIdx = pColDpbCtu->getCUMvField(RefPicList(eColRefPicList))->getRefIdx(absPartAddr);
 #else
@@ -3094,6 +3096,7 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
     const Int colRefPOC  = pColCtu->getSlice()->getRefPOC(eColRefPicList, iColRefIdx);
 #endif
     const Int currRefPOC = m_pcSlice->getRefPic(eRefPicList, refIdx)->getPOC();
+    /********************************    scaleMV的操作仍是未解之谜   ************************************/
     const Int scale      = xGetDistScaleFactor(currPOC, currRefPOC, colPOC, colRefPOC);
     if ( scale == 4096 )
     {
@@ -3103,6 +3106,7 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
     {
       rcMv = cColMv.scaleMv( scale );
     }
+    /*****************************    ↑提案K1003中只提到要这样计算，但未写为何要这样计算↑   ***********************/
   }
 
   return true;
@@ -3111,7 +3115,7 @@ Bool TComDataCU::xGetColMVP( const RefPicList eRefPicList, const Int ctuRsAddr, 
 // Static member
 Int TComDataCU::xGetDistScaleFactor(Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, Int iColRefPOC)
 {
-  Int iDiffPocD = iColPOC - iColRefPOC;
+  Int iDiffPocD = iColPOC - iColRefPOC;//D-同位
   Int iDiffPocB = iCurrPOC - iCurrRefPOC;
 
   if( iDiffPocD == iDiffPocB )
@@ -3119,11 +3123,11 @@ Int TComDataCU::xGetDistScaleFactor(Int iCurrPOC, Int iCurrRefPOC, Int iColPOC, 
     return 4096;
   }
   else
-  {
-    Int iTDB      = Clip3( -128, 127, iDiffPocB );
-    Int iTDD      = Clip3( -128, 127, iDiffPocD );
-    Int iX        = (0x4000 + abs(iTDD/2)) / iTDD;
-    Int iScale    = Clip3( -4096, 4095, (iTDB * iX + 32) >> 6 );
+  {/*   谁能教教我这里啊555  */
+    Int iTDB      = Clip3( -128, 127, iDiffPocB );//限制到±128帧
+    Int iTDD      = Clip3( -128, 127, iDiffPocD );//限制到±128帧
+    Int iX        = (0x4000 + abs(iTDD/2)) / iTDD;// （ 4096 * 4 / iTDD） ±（1/2）
+    Int iScale    = Clip3( -4096, 4095, (iTDB * iX + 32) >> 6 );// （4096 * 4）*（iTDB/iTDD） ±（1/2）*iTDB
     return iScale;
   }
 }

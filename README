@@ -4,7 +4,7 @@
 ***part          : 等同于AVS3中的SCU
 ***absIdx        :Raster索引
 ***AbsZorderIdx   ：Zorder索引
-
+***a             :array 数组（内存空间）
 
 
 

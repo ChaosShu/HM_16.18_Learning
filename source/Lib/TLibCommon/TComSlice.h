@@ -1296,7 +1296,7 @@ private:
   //  Data
   Int                        m_iSliceQpDelta;
   Int                        m_iSliceChromaQpDelta[MAX_NUM_COMPONENT];
-  TComPic*                   m_apcRefPicList [NUM_REF_PIC_LIST_01][MAX_NUM_REF+1];
+  TComPic*                   m_apcRefPicList [NUM_REF_PIC_LIST_01][MAX_NUM_REF+1];/*参考图像数组*/
   Int                        m_aiRefPOCList  [NUM_REF_PIC_LIST_01][MAX_NUM_REF+1];
   Bool                       m_bIsUsedAsLongTerm[NUM_REF_PIC_LIST_01][MAX_NUM_REF+1];
   Int                        m_iDepth;
@@ -1309,7 +1309,7 @@ private:
   const TComSPS*             m_pcSPS;
   const TComPPS*             m_pcPPS;
   TComPic*                   m_pcPic;
-  Bool                       m_colFromL0Flag;  // collocated picture from List0 flag
+  Bool                       m_colFromL0Flag;  // collocated picture from List0 flag，同位区图的图像源自L0
 
   Bool                       m_noOutputPriorPicsFlag;
   Bool                       m_noRaslOutputFlag;
