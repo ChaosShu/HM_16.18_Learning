@@ -84,11 +84,11 @@ Double TComRdCost::calcRdCost( Double numBits, Double distortion, DFunc eDFunc )
 
   if (eDFunc == DF_SAD)
   {
-    if (m_costMode != COST_STANDARD_LOSSY)
+    if (m_costMode != COST_STANDARD_LOSSY)//含无损的代价计算
     {
       return ((distortion * 65536.0) / lambda) + numBits; // all lossless costs would have uiDistortion=0, and therefore this cost function can be used.
     }
-    else
+    else//标准的有损
     {
       return distortion + (((numBits * lambda) ) / 65536.0);
     }

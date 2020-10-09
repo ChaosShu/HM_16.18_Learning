@@ -5,7 +5,8 @@
 ***absIdx        :Raster索引
 ***AbsZorderIdx   ：Zorder索引
 ***a             :array 数组（内存空间）
-
+***m             :member,成员
+***c             :class,const  类，常量
 
 
 

@@ -3062,7 +3062,7 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
     {
       RefPicList  eRefPicList = ( iRefList ? REF_PIC_LIST_1 : REF_PIC_LIST_0 );
 
-      for ( Int iRefIdxTemp = 0; iRefIdxTemp < pcCU->getSlice()->getNumRefIdx(eRefPicList); iRefIdxTemp++ )//处理当前帧一个list里的每张参考图像
+      for ( Int iRefIdxTemp = 0; iRefIdxTemp < pcCU->getSlice()->getNumRefIdx(eRefPicList); iRefIdxTemp++ )//处理当前帧一个list里的每张可能的参考图像
       {
         uiBitsTemp = uiMbBits[iRefList];
         if ( pcCU->getSlice()->getNumRefIdx(eRefPicList) > 1 )
@@ -3073,7 +3073,7 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
             uiBitsTemp--;
           }
         }
-        xEstimateMvPredAMVP( pcCU, pcOrgYuv, iPartIdx, eRefPicList, iRefIdxTemp, cMvPred[iRefList][iRefIdxTemp], false, &biPDistTemp);
+        xEstimateMvPredAMVP( pcCU, pcOrgYuv, iPartIdx, eRefPicList, iRefIdxTemp, cMvPred[iRefList][iRefIdxTemp], false, &biPDistTemp);//获取bestMVP及AMVP候选列表相关信息
         aaiMvpIdx[iRefList][iRefIdxTemp] = pcCU->getMVPIdx(eRefPicList, uiPartAddr);
         aaiMvpNum[iRefList][iRefIdxTemp] = pcCU->getMVPNum(eRefPicList, uiPartAddr);
 
@@ -3465,7 +3465,8 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv* 
 
 
 // AMVP
-Void TEncSearch::xEstimateMvPredAMVP( TComDataCU* pcCU, TComYuv* pcOrgYuv, UInt uiPartIdx, RefPicList eRefPicList, Int iRefIdx, TComMv& rcMvPred, Bool bFilled, Distortion* puiDistBiP )
+Void TEncSearch::xEstimateMvPredAMVP( TComDataCU* pcCU, TComYuv* pcOrgYuv, UInt uiPartIdx/*PU的地址*/
+                                        , RefPicList eRefPicList, Int iRefIdx, TComMv& rcMvPred, Bool bFilled, Distortion* puiDistBiP )
 {
   AMVPInfo*  pcAMVPInfo = pcCU->getCUMvField(eRefPicList)->getAMVPInfo();
 
@@ -3474,7 +3475,7 @@ Void TEncSearch::xEstimateMvPredAMVP( TComDataCU* pcCU, TComYuv* pcOrgYuv, UInt 
   TComMv     cZeroMv;
   TComMv     cMvPred;
   Distortion uiBestCost = std::numeric_limits<Distortion>::max();
-  UInt       uiPartAddr = 0;
+  UInt       uiPartAddr = 0;//PU在CTU内地址
   Int        iRoiWidth, iRoiHeight;
   Int        i;
   Int        minMVPCand;
@@ -3484,12 +3485,12 @@ Void TEncSearch::xEstimateMvPredAMVP( TComDataCU* pcCU, TComYuv* pcOrgYuv, UInt 
   // Fill the MV Candidates
   if (!bFilled)
   {
-    pcCU->fillMvpCand( uiPartIdx, uiPartAddr, eRefPicList, iRefIdx, pcAMVPInfo );
+    pcCU->fillMvpCand( uiPartIdx, uiPartAddr, eRefPicList, iRefIdx, pcAMVPInfo );//更新pcAMVPInfo
   }
   // initialize Mvp index & Mvp
 #if MCTS_ENC_CHECK
   if (m_pcEncCfg->getTMCTSSEITileConstraint() && pcCU->isLastColumnCTUInTile() && (pcAMVPInfo->numSpatialMVPCandidates < pcAMVPInfo->iN))
-  {
+  {//根据IF里的情况选择[0]或者[1]作为默认最优的MVP
     iBestIdx    = (pcAMVPInfo->numSpatialMVPCandidates == 0) ? 1 : 0;
     cBestMv     = pcAMVPInfo->m_acMvCand[(pcAMVPInfo->numSpatialMVPCandidates == 0) ? 1 : 0];
     minMVPCand  = (pcAMVPInfo->numSpatialMVPCandidates == 0) ? 1 : 0;
@@ -3531,8 +3532,8 @@ Void TEncSearch::xEstimateMvPredAMVP( TComDataCU* pcCU, TComYuv* pcOrgYuv, UInt 
 
   m_cYuvPredTemp.clear();
   //-- Check Minimum Cost.
-  for ( i = minMVPCand ; i < maxMVPCand; i++)
-  {
+  for ( i = minMVPCand ; i < maxMVPCand; i++)//遍历每个候选MVP，选出最优的MVP
+  {//根据Cost选处最佳MVP时  __似乎__  直接用MVP当MV计算预测块以及对应的失真
     Distortion uiTmpCost;
     uiTmpCost = xGetTemplateCost( pcCU, uiPartAddr, pcOrgYuv, &m_cYuvPredTemp, pcAMVPInfo->m_acMvCand[i], i, AMVP_MAX_NUM_CANDS, eRefPicList, iRefIdx, iRoiWidth, iRoiHeight);
     if ( uiBestCost > uiTmpCost )
@@ -3702,14 +3703,26 @@ Void TEncSearch::xCheckBestMVP ( TComDataCU* pcCU, RefPicList eRefPicList, TComM
   }
 }
 
-
+/**
+* \param    pcCU,
+* \param    uiPartAddr,
+* \param    pcOrgYuv,
+* \param    pcTemplateCand,
+* \param    cMvCand,
+* \param    iMVPIdx,
+* \param    iMVPNum,
+* \param    eRefPicList,
+* \param    iRefIdx,
+* \param    iSizeX,
+* \param    iSizeY
+*/
 Distortion TEncSearch::xGetTemplateCost( TComDataCU* pcCU,
-                                         UInt        uiPartAddr,
-                                         TComYuv*    pcOrgYuv,
-                                         TComYuv*    pcTemplateCand,
-                                         TComMv      cMvCand,
-                                         Int         iMVPIdx,
-                                         Int         iMVPNum,
+                                         UInt        uiPartAddr,/*PU地址*/
+                                         TComYuv*    pcOrgYuv,/*原始图像地址*/
+                                         TComYuv*    pcTemplateCand,/*原始图像地址*/
+                                         TComMv      cMvCand,/*候选MVP*/
+                                         Int         iMVPIdx,/*候选MVP在列表内索引*/
+                                         Int         iMVPNum,/*候选MVP列表里最大MVP数*/
                                          RefPicList  eRefPicList,
                                          Int         iRefIdx,
                                          Int         iSizeX,
@@ -3733,14 +3746,14 @@ Distortion TEncSearch::xGetTemplateCost( TComDataCU* pcCU,
   }
 
   if ( pcCU->getSlice()->testWeightPred() && pcCU->getSlice()->getSliceType()==P_SLICE )
-  {
+  {//加权预测
     xWeightedPredictionUni( pcCU, pcTemplateCand, uiPartAddr, iSizeX, iSizeY, eRefPicList, pcTemplateCand, iRefIdx );
   }
 
   // calc distortion
 
-  uiCost = m_pcRdCost->getDistPart( pcCU->getSlice()->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA), pcTemplateCand->getAddr(COMPONENT_Y, uiPartAddr), pcTemplateCand->getStride(COMPONENT_Y), pcOrgYuv->getAddr(COMPONENT_Y, uiPartAddr), pcOrgYuv->getStride(COMPONENT_Y), iSizeX, iSizeY, COMPONENT_Y, DF_SAD );
-  uiCost = (UInt) m_pcRdCost->calcRdCost( m_auiMVPIdxCost[iMVPIdx][iMVPNum], uiCost, DF_SAD );
+  uiCost = m_pcRdCost->getDistPart( pcCU->getSlice()->getSPS()->getBitDepth(CHANNEL_TYPE_LUMA), pcTemplateCand->getAddr(COMPONENT_Y, uiPartAddr), pcTemplateCand->getStride(COMPONENT_Y), pcOrgYuv->getAddr(COMPONENT_Y, uiPartAddr), pcOrgYuv->getStride(COMPONENT_Y), iSizeX, iSizeY, COMPONENT_Y, DF_SAD );//失真
+  uiCost = (UInt) m_pcRdCost->calcRdCost( m_auiMVPIdxCost[iMVPIdx][iMVPNum], uiCost, DF_SAD );//para1，比特数到底是在哪里计算出来的啊啊啊啊，而且也没看到ME的代码
   return uiCost;
 }
 

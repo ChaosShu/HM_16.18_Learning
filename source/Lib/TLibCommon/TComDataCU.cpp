@@ -2632,8 +2632,8 @@ Void TComDataCU::getPartPosition( UInt partIdx, Int& xP, Int& yP, Int& nPSW, Int
  * \param iRefIdx
  * \param pInfo
  */
-Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const RefPicList eRefPicList, const Int refIdx, AMVPInfo* pInfo ) const
-{
+Void TComDataCU::fillMvpCand ( const UInt partIdx, const UInt partAddr, const RefPicList eRefPicList, const Int refIdx, AMVPInfo* pInfo ) const///123123
+{//123
   pInfo->iN = 0;//初始化AMVP内存储的MVP数量为0
   if (refIdx < 0)
   {

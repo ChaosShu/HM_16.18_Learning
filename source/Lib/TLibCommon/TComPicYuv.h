@@ -70,7 +70,7 @@ private:
 
   Int   m_picWidth;                                 ///< Width of picture in pixels
   Int   m_picHeight;                                ///< Height of picture in pixels
-  ChromaFormat m_chromaFormatIDC;                   ///< Chroma Format
+  ChromaFormat m_chromaFormatIDC;                   /*//< Chroma Format*/
 
   Int*  m_ctuOffsetInBuffer[MAX_NUM_CHANNEL_TYPE];  ///< Gives an offset in the buffer for a given CTU (and channel)
   Int*  m_subCuOffsetInBuffer[MAX_NUM_CHANNEL_TYPE];///< Gives an offset in the buffer for a given sub-CU (and channel), relative to start of CTU

@@ -8,4 +8,8 @@
     <LocalDebuggerCommandArguments>-c encoder_randomaccess_main.cfg -c RaceHorses.cfg</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommandArguments>-c encoder_randomaccess_main.cfg -c RaceHorses.cfg</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

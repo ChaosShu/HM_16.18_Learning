@@ -254,7 +254,7 @@ Void TComPrediction::xPredIntraAng(       Int bitDepth,
     }
   }
 
-  /****************************************角度预测***********************************************/
+  /****************************************						角度预测					***********************************************/
   else // Do angular predictions
   {
     const Bool       bIsModeVer         = (dirMode >= 18);//是否为垂直类模式（大于18为垂直模式）
@@ -358,13 +358,13 @@ Void TComPrediction::xPredIntraAng(       Int bitDepth,
       //                                                     deltaPos == y * offSet   dst滑动一个Stride
       for (Int y=0, deltaPos=intraPredAngle; y<height; y++, deltaPos+=intraPredAngle, pDsty+=dstStride)
       {//每一行
-        const Int deltaInt   = deltaPos >> 5;   //  Ref中的位置
-        const Int deltaFract = deltaPos & (32 - 1); //3个对角模式刚好为0，其余都是 deltaPos
+        const Int deltaInt   = deltaPos >> 5;   //  Ref中的位置（整像素偏移）
+        const Int deltaFract = deltaPos & (32 - 1); //3个对角模式刚好为0，其余都是 deltaPos（1/32像素偏移，用于产生滤波器系数）
 
         if (deltaFract)
         {
           // Do linear filtering
-          const Pel *pRM=refMain+deltaInt+1;    //+1 是因为？？
+          const Pel *pRM=refMain+deltaInt+1;    //+1 是因为？？(索引可能相差1，Ref中的[0]是当前预测块左上方像素，Pix[0][0]是当前预测块内左上角像素)
           Int lastRefMainPel=*pRM++;//last指向当前 rRM 的位置
           for (Int x=0;x<width;pRM++,x++)
           {
@@ -474,7 +474,7 @@ Void TComPrediction::predIntraAng( const ComponentID compID, UInt uiDirMode, Pel
 #else
       const Int channelsBitDepthForPrediction = rTu.getCU()->getSlice()->getSPS()->getBitDepth(channelType);
 #endif
-      xPredIntraAng( channelsBitDepthForPrediction, ptrSrc+sw+1, sw, pDst, uiStride, iWidth, iHeight, channelType, uiDirMode, enableEdgeFilters );
+      xPredIntraAng( channelsBitDepthForPrediction, ptrSrc+sw+1, sw, pDst, uiStride, iWidth, iHeight, channelType, uiDirMode, enableEdgeFilters );//角度模式预测
 
       if( uiDirMode == DC_IDX )
       {
